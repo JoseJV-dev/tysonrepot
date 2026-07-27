@@ -11,6 +11,7 @@ export function NavMenu() {
     { label: 'Início', href: '#home' },
     { label: 'Sobre a Série', href: '#video-style' },
     { label: 'Cartão Robô', href: '#robot-card' },
+    { label: 'Projetos', href: '#projects' },
   ];
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {

@@ -41,7 +41,7 @@ export function RobotCard() {
     <motion.div 
       className="relative flex items-center justify-center w-full max-w-4xl mx-auto perspective-1000 my-20"
       animate={{
-        minHeight: state === 'open' && !isDesktop ? 1200 : 500
+        minHeight: state === 'open' && !isDesktop ? 1300 : 500
       }}
       transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
     >
@@ -58,7 +58,7 @@ export function RobotCard() {
             rotateY: state === 'open' ? 0 : (isDesktop ? 90 : 0),
             rotateX: state === 'open' ? 0 : (isDesktop ? 0 : -90),
             x: state === 'open' ? (isDesktop ? -380 : 0) : 0,
-            y: state === 'open' ? (isDesktop ? 0 : 400) : 0,
+            y: state === 'open' ? (isDesktop ? 0 : 380) : 0,
             opacity: state === 'open' ? 1 : 0,
           }}
           transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
@@ -180,7 +180,7 @@ export function RobotCard() {
             rotateY: state === 'open' ? 0 : (isDesktop ? -90 : 0),
             rotateX: state === 'open' ? 0 : (isDesktop ? 0 : -90),
             x: state === 'open' ? (isDesktop ? 380 : 0) : 0,
-            y: state === 'open' ? (isDesktop ? 0 : 820) : 0,
+            y: state === 'open' ? (isDesktop ? 0 : 780) : 0,
             opacity: state === 'open' ? 1 : 0,
           }}
           transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}

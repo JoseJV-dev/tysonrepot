@@ -7,6 +7,7 @@ import { HeroLeft } from './components/HeroLeft';
 import { VideoStyleRight } from './components/VideoStyleRight';
 import { BackgroundElements } from './components/BackgroundElements';
 import { RobotCard } from './components/RobotCard';
+import { Projects } from './components/Projects';
 import { ThemeProvider } from './components/ThemeProvider';
 import { ThemeToggle } from './components/ThemeToggle';
 import { NavMenu } from './components/NavMenu';
@@ -90,6 +91,8 @@ export default function App() {
           
           <RobotCard />
         </motion.div>
+
+        <Projects />
       </div>
       
       <Footer />
