@@ -8,6 +8,7 @@ import { VideoStyleRight } from './components/VideoStyleRight';
 import { BackgroundElements } from './components/BackgroundElements';
 import { RobotCard } from './components/RobotCard';
 import { Projects } from './components/Projects';
+import { PhysicsPlayground } from './components/PhysicsPlayground';
 import { ThemeProvider } from './components/ThemeProvider';
 import { ThemeToggle } from './components/ThemeToggle';
 import { NavMenu } from './components/NavMenu';
@@ -93,6 +94,7 @@ export default function App() {
         </motion.div>
 
         <Projects />
+        <PhysicsPlayground />
       </div>
       
       <Footer />
