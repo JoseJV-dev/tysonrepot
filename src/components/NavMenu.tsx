@@ -9,10 +9,12 @@ export function NavMenu() {
 
   const menuItems = [
     { label: 'Início', href: '#home' },
-    { label: 'Sobre a Série', href: '#video-style' },
     { label: 'Cartão Robô', href: '#robot-card' },
     { label: 'Projetos', href: '#projects' },
-    { label: 'Playground', href: '#physics-playground' },
+    { label: 'Habilidades', href: '#skills' },
+    { label: 'Trajetória', href: '#experience' },
+    { label: 'Publicações', href: '#publications' },
+    { label: 'Contato', href: '#contact' },
   ];
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {

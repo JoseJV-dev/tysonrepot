@@ -1,5 +1,5 @@
-import { motion, AnimatePresence } from 'motion/react';
-import { useState, useEffect } from 'react';
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   Check, GraduationCap, Code, Settings2, 
   Phone, MessageCircle, Facebook, QrCode, Building2
@@ -29,9 +29,37 @@ export function RobotCard() {
   const [state, setState] = useState<CardState>('closed');
   const isDesktop = useMediaQuery('(min-width: 1024px)'); // lg breakpoint
 
+  const ref = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+
+  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
+  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
+
+  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
+  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (!ref.current || state !== 'closed') return; // Only tilt when closed
+    const rect = ref.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+    x.set(mouseX / width - 0.5);
+    y.set(mouseY / height - 0.5);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
+
   const handleToggle = () => {
     if (state === 'closed') {
       setState('open');
+      x.set(0);
+      y.set(0);
     } else {
       setState('closed');
     }
@@ -41,7 +69,7 @@ export function RobotCard() {
     <motion.div 
       className="relative flex items-center justify-center w-full max-w-4xl mx-auto perspective-1000 my-20"
       animate={{
-        minHeight: state === 'open' && !isDesktop ? 1300 : 500
+        minHeight: state === 'open' && !isDesktop ? 1000 : 500
       }}
       transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
     >
@@ -58,13 +86,13 @@ export function RobotCard() {
             rotateY: state === 'open' ? 0 : (isDesktop ? 90 : 0),
             rotateX: state === 'open' ? 0 : (isDesktop ? 0 : -90),
             x: state === 'open' ? (isDesktop ? -380 : 0) : 0,
-            y: state === 'open' ? (isDesktop ? 0 : 380) : 0,
+            y: state === 'open' ? (isDesktop ? 0 : -320) : 0,
             opacity: state === 'open' ? 1 : 0,
           }}
           transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
           style={{ 
             originX: isDesktop ? 1 : 0.5,
-            originY: isDesktop ? 0.5 : 0 
+            originY: isDesktop ? 0.5 : 1 
           }}
           className="absolute z-10 w-[240px] md:w-[280px] lg:w-[240px] h-[400px] bg-slate-50 rounded-2xl shadow-2xl p-6 text-slate-900 flex flex-col justify-between transform-style-3d border border-slate-200"
         >
@@ -107,12 +135,47 @@ export function RobotCard() {
 
         {/* CENTER BODY - Main Card */}
         <motion.div
+          ref={ref}
           onClick={handleToggle}
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handleMouseLeave}
           className="relative z-30 cursor-pointer flex flex-col items-center group perspective-1000"
-          whileHover={{ scale: state === 'closed' ? 1.05 : 1 }}
+          whileHover={{ scale: state === 'closed' ? 1.05 : (state === 'open' && !isDesktop ? 0.6 : 1) }}
+          animate={{
+            scale: state === 'open' && !isDesktop ? 0.6 : 1,
+            y: 0
+          }}
+          style={{
+             rotateX: rotateX,
+             rotateY: rotateY,
+             transformStyle: "preserve-3d"
+          }}
           transition={{ type: "spring", stiffness: 300, damping: 20 }}
         >
           
+          {/* Hover Tooltip */}
+          <div 
+            style={{ transform: state === 'closed' ? "translateZ(60px)" : "translateZ(0px)" }}
+            className={cn(
+            "absolute opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50",
+            state === 'closed' ? "-top-14" : "-bottom-14"
+          )}>
+            <div className="bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-[0_0_20px_rgba(0,168,255,0.2)] whitespace-nowrap border border-white/10 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#00a8ff] animate-pulse" />
+              {state === 'closed' ? 'Clique para interagir com o robô' : 'Clique para recolher o painel'}
+            </div>
+            <div className={cn(
+              "w-2.5 h-2.5 bg-slate-900 border-white/10 transform rotate-45 absolute left-1/2 -translate-x-1/2",
+              state === 'closed' ? "border-b border-r -bottom-[5px]" : "border-t border-l -top-[5px]"
+            )} />
+          </div>
+
+          {/* Dynamic Hover Drop Shadow */}
+          <div 
+            style={{ transform: "translateZ(-20px)" }}
+            className="absolute inset-0 top-0 bg-[#00a8ff]/30 blur-[50px] rounded-3xl opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 z-10 pointer-events-none" 
+          />
+
           {/* Robot Head (Only visible when open) */}
           <motion.div
             initial={false}
@@ -121,23 +184,40 @@ export function RobotCard() {
               opacity: state === 'open' ? 1 : 0 
             }}
             transition={{ duration: 0.6, type: "spring" }}
-            className="absolute -top-16 w-32 h-20 bg-[#002244] rounded-t-3xl border-4 border-[#0055a4] flex items-center justify-center gap-4 z-0 shadow-lg"
+            className="absolute -top-16 w-32 h-20 bg-gradient-to-b from-[#003a70] to-[#001122] rounded-t-3xl border-t-4 border-l-4 border-r-4 border-[#0055a4] flex items-center justify-center gap-4 z-0 shadow-[inset_0_2px_5px_rgba(255,255,255,0.4),0_-5px_15px_rgba(0,168,255,0.3)] overflow-hidden"
           >
-            <div className="w-5 h-5 bg-[#00a8ff] rounded-full shadow-[0_0_15px_#00a8ff] animate-pulse"></div>
-            <div className="w-5 h-5 bg-[#00a8ff] rounded-full shadow-[0_0_15px_#00a8ff] animate-pulse"></div>
+            {/* Eyes */}
+            <div className="w-5 h-5 bg-[#00a8ff] rounded-full shadow-[0_0_15px_#00a8ff] animate-pulse relative">
+              <div className="absolute inset-1 bg-white/40 rounded-full" />
+            </div>
+            <div className="w-5 h-5 bg-[#00a8ff] rounded-full shadow-[0_0_15px_#00a8ff] animate-pulse relative">
+              <div className="absolute inset-1 bg-white/40 rounded-full" />
+            </div>
           </motion.div>
 
           {/* Main Shield / Body */}
-          <div className={cn(
-            "relative w-[280px] h-[360px] bg-gradient-to-b from-[#003366] to-[#001122] rounded-3xl shadow-2xl flex flex-col items-center justify-center p-8 border border-white/10 z-20 transition-all duration-500",
-            state === 'open' && "bg-gradient-to-b from-white to-slate-100 shadow-[0_0_50px_rgba(0,168,255,0.2)]"
+          <div 
+            style={{ transform: state === 'closed' ? "translateZ(40px)" : "translateZ(0px)" }}
+            className={cn(
+            "relative w-[280px] h-[360px] bg-gradient-to-b from-[#003a70] via-[#002244] to-[#000a14] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_2px_3px_rgba(255,255,255,0.3),inset_0_-4px_10px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center p-8 border border-[#0055a4]/30 z-20 transition-all duration-500 overflow-hidden",
+            state === 'open' && "bg-gradient-to-b from-white via-slate-50 to-slate-200 shadow-[0_20px_50px_rgba(0,168,255,0.2),inset_0_2px_3px_rgba(255,255,255,1),inset_0_-4px_10px_rgba(0,0,0,0.1)] border-white/80"
           )}>
+            {/* Glossy overlay */}
+            <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 pointer-events-none rounded-3xl z-30" />
             
-            {/* Hexagon Logo Container */}
-            <div className="relative mb-6">
-               <svg viewBox="0 0 100 100" className="w-24 h-24 drop-shadow-xl" style={{ color: state === 'open' ? '#0055a4' : '#ffffff' }}>
-                 <path d="M 18 40 A 35 35 0 0 0 82 40" stroke="currentColor" strokeWidth="10" fill="none" strokeLinecap="round" />
-                 <path d="M 5 20 L 95 20 L 50 85 Z M 30 35 L 70 35 L 50 65 Z" fill="currentColor" fillRule="evenodd" />
+            {/* Circuit pattern overlay for realism */}
+            <div 
+              className="absolute inset-0 opacity-10 pointer-events-none z-0 mix-blend-overlay"
+              style={{
+                backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`
+              }}
+            />
+            
+            {/* Logo Container */}
+            <div className="relative mb-6 z-20">
+               <svg viewBox="0 0 100 100" className="w-24 h-24 drop-shadow-xl transition-colors duration-500" style={{ color: state === 'open' ? '#0055a4' : '#00a8ff' }}>
+                 <path d="M 18 40 A 35 35 0 0 0 82 40" stroke="currentColor" strokeWidth="10" fill="none" strokeLinecap="round" className={state === 'closed' ? "drop-shadow-[0_0_8px_#00a8ff]" : ""} />
+                 <path d="M 5 20 L 95 20 L 50 85 Z M 30 35 L 70 35 L 50 65 Z" fill="currentColor" fillRule="evenodd" className={state === 'closed' ? "drop-shadow-[0_0_12px_#00a8ff]" : ""} />
                  <rect x="12" y="20" width="4" height="20" fill="currentColor" />
                  <circle cx="14" cy="44" r="6" fill="currentColor" />
                </svg>
@@ -180,13 +260,13 @@ export function RobotCard() {
             rotateY: state === 'open' ? 0 : (isDesktop ? -90 : 0),
             rotateX: state === 'open' ? 0 : (isDesktop ? 0 : -90),
             x: state === 'open' ? (isDesktop ? 380 : 0) : 0,
-            y: state === 'open' ? (isDesktop ? 0 : 780) : 0,
+            y: state === 'open' ? (isDesktop ? 0 : 320) : 0,
             opacity: state === 'open' ? 1 : 0,
           }}
           transition={{ duration: 0.8, type: "spring", bounce: 0.2 }}
           style={{ 
             originX: isDesktop ? 0 : 0.5,
-            originY: isDesktop ? 0.5 : 0 
+            originY: isDesktop ? 0.5 : 0.5 
           }}
           className="absolute z-10 w-[240px] md:w-[280px] lg:w-[240px] h-[400px] bg-slate-50 rounded-2xl shadow-2xl p-6 text-slate-900 flex flex-col justify-between transform-style-3d border border-slate-200"
         >

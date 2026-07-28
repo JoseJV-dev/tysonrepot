@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from './ThemeProvider';
-import { useEffect, useState } from 'react';
 
 const formulas = [
   "E = mc²",
@@ -11,6 +11,47 @@ const formulas = [
 ];
 
 const symbols = ["∑", "π", "∞", "∫", "ℏ"];
+
+const lightnings = [
+  "M -100 200 L 200 200 L 300 300 L 600 300 L 700 400 L 1100 400",
+  "M 300 -100 L 300 200 L 200 300 L 200 600 L 400 800 L 400 1100",
+  "M 1100 600 L 800 600 L 700 700 L 400 700 L 300 800 L -100 800",
+  "M 800 1100 L 800 800 L 900 700 L 900 400 L 700 200 L 700 -100",
+  "M 100 100 L 200 100 L 250 150 L 250 300 L 350 400",
+  "M 900 900 L 800 900 L 750 850 L 750 700 L 650 600"
+];
+
+interface AnimatedLightningProps {
+  path: string;
+  delay: number;
+  theme: string;
+}
+
+const AnimatedLightning: React.FC<AnimatedLightningProps> = ({ path, delay, theme }) => {
+  return (
+    <motion.path
+      d={path}
+      fill="transparent"
+      stroke={theme === 'dark' ? '#ccff00' : '#0055ff'}
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      initial={{ pathLength: 0, pathOffset: 0, opacity: 0 }}
+      animate={{ 
+        pathLength: [0, 0.4, 0],
+        pathOffset: [0, 0.6, 1],
+        opacity: [0, 1, 0]
+      }}
+      transition={{
+        duration: 4,
+        repeat: Infinity,
+        repeatDelay: delay,
+        ease: "linear"
+      }}
+      style={{ filter: `drop-shadow(0 0 10px ${theme === 'dark' ? '#ccff00' : '#0055ff'})` }}
+    />
+  );
+};
 
 export function BackgroundElements() {
   const { theme } = useTheme();
@@ -106,6 +147,13 @@ export function BackgroundElements() {
           <path d="M60 60 l20 -20" fill="none" stroke="currentColor" strokeWidth="1" className={theme === 'dark' ? 'text-neon' : 'text-azul'}/>
         </pattern>
         <rect width="100%" height="100%" fill="url(#circuit)"/>
+      </svg>
+
+      {/* Dynamic Lightning Circuits */}
+      <svg className={`absolute inset-0 w-full h-full pointer-events-none ${theme === 'dark' ? 'opacity-30' : 'opacity-20'}`} viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+        {lightnings.map((path, i) => (
+          <AnimatedLightning key={`lightning-${i}`} path={path} delay={i * 1.5 + Math.random() * 2} theme={theme} />
+        ))}
       </svg>
     </div>
   );

@@ -30,7 +30,13 @@ const projects = [
   }
 ];
 
-function TiltCard({ project, index, theme }: { project: any, index: number, theme: string }) {
+interface TiltCardProps {
+  project: any;
+  index: number;
+  theme: string;
+}
+
+const TiltCard: React.FC<TiltCardProps> = ({ project, index, theme }) => {
   const ref = useRef<HTMLDivElement>(null);
   
   const x = useMotionValue(0);

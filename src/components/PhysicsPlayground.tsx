@@ -13,158 +13,169 @@ export function PhysicsPlayground() {
   const [gravity] = useState(9.8);
   
   useEffect(() => {
-    if (!d3Container.current) return;
-    
-    // Clear previous drawing
-    d3.select(d3Container.current).selectAll('*').remove();
-    
-    // Dimensions
-    const width = d3Container.current.clientWidth;
-    const height = 400;
-    const margin = { top: 20, right: 20, bottom: 40, left: 50 };
-    
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
-    
-    // Calculate trajectory data
-    const angleRad = angle * (Math.PI / 180);
-    const v0x = velocity * Math.cos(angleRad);
-    const v0y = velocity * Math.sin(angleRad);
-    
-    // Time of flight: t = 2 * v0y / g
-    const tFlight = (2 * v0y) / gravity;
-    
-    const numPoints = 100;
-    const data: { x: number; y: number }[] = [];
-    
-    for (let i = 0; i <= numPoints; i++) {
-      const t = (tFlight * i) / numPoints;
-      const x = v0x * t;
-      const y = v0y * t - 0.5 * gravity * t * t;
-      data.push({ x, y: Math.max(0, y) }); // Prevent negative Y
-    }
-    
-    const maxX = Math.max(v0x * tFlight, 100); // Scale X
-    const maxY = Math.max((v0y * v0y) / (2 * gravity), 50); // Scale Y
-    
-    // Create SVG
-    const svg = d3.select(d3Container.current)
-      .append('svg')
-      .attr('width', width)
-      .attr('height', height)
-      .append('g')
-      .attr('transform', `translate(${margin.left},${margin.top})`);
+    const renderD3 = () => {
+      if (!d3Container.current) return;
       
-    // Scales
-    const xScale = d3.scaleLinear()
-      .domain([0, maxX * 1.1])
-      .range([0, innerWidth]);
+      // Clear previous drawing
+      d3.select(d3Container.current).selectAll('*').remove();
       
-    const yScale = d3.scaleLinear()
-      .domain([0, maxY * 1.2])
-      .range([innerHeight, 0]);
+      // Dimensions
+      const width = d3Container.current.clientWidth;
+      const height = d3Container.current.clientHeight || 450;
+      const margin = { top: 20, right: 20, bottom: 40, left: 50 };
       
-    // Axes
-    const xAxis = d3.axisBottom(xScale).ticks(10);
-    const yAxis = d3.axisLeft(yScale).ticks(5);
-    
-    // Style axes based on theme
-    const axisColor = theme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
-    
-    svg.append('g')
-      .attr('transform', `translate(0,${innerHeight})`)
-      .call(xAxis)
-      .selectAll('text').style('fill', axisColor);
+      const innerWidth = width - margin.left - margin.right;
+      const innerHeight = height - margin.top - margin.bottom;
       
-    svg.append('g')
-      .call(yAxis)
-      .selectAll('text').style('fill', axisColor);
+      // Calculate trajectory data
+      const angleRad = angle * (Math.PI / 180);
+      const v0x = velocity * Math.cos(angleRad);
+      const v0y = velocity * Math.sin(angleRad);
       
-    svg.selectAll('.domain, .tick line').style('stroke', axisColor);
-    
-    // Axis labels
-    svg.append('text')
-      .attr('x', innerWidth / 2)
-      .attr('y', innerHeight + 35)
-      .style('text-anchor', 'middle')
-      .style('fill', axisColor)
-      .style('font-size', '12px')
-      .text('Distância (m)');
+      // Time of flight: t = 2 * v0y / g
+      const tFlight = (2 * v0y) / gravity;
       
-    svg.append('text')
-      .attr('transform', 'rotate(-90)')
-      .attr('x', -innerHeight / 2)
-      .attr('y', -35)
-      .style('text-anchor', 'middle')
-      .style('fill', axisColor)
-      .style('font-size', '12px')
-      .text('Altura (m)');
-    
-    // Line generator
-    const line = d3.line<{ x: number; y: number }>()
-      .x(d => xScale(d.x))
-      .y(d => yScale(d.y))
-      .curve(d3.curveBasis);
+      const numPoints = 100;
+      const data: { x: number; y: number }[] = [];
       
-    // Draw trajectory line
-    const path = svg.append('path')
-      .datum(data)
-      .attr('fill', 'none')
-      .attr('stroke', theme === 'dark' ? '#ccff00' : '#0055ff') // Neon or Azul
-      .attr('stroke-width', 3)
-      .attr('d', line);
+      for (let i = 0; i <= numPoints; i++) {
+        const t = (tFlight * i) / numPoints;
+        const x = v0x * t;
+        const y = v0y * t - 0.5 * gravity * t * t;
+        data.push({ x, y: Math.max(0, y) }); // Prevent negative Y
+      }
       
-    // Animate path
-    const totalLength = path.node()?.getTotalLength() || 0;
-    
-    path
-      .attr('stroke-dasharray', `${totalLength} ${totalLength}`)
-      .attr('stroke-dashoffset', totalLength)
-      .transition()
-      .duration(2000)
-      .ease(d3.easeLinear)
-      .attr('stroke-dashoffset', 0);
+      const maxX = Math.max(v0x * tFlight, 100); // Scale X
+      const maxY = Math.max((v0y * v0y) / (2 * gravity), 50); // Scale Y
       
-    // Add a moving ball
-    const ball = svg.append('circle')
-      .attr('r', 6)
-      .attr('fill', theme === 'dark' ? '#ccff00' : '#0055ff')
-      .attr('transform', `translate(${xScale(data[0].x)},${yScale(data[0].y)})`);
+      // Create SVG
+      const svg = d3.select(d3Container.current)
+        .append('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .append('g')
+        .attr('transform', `translate(${margin.left},${margin.top})`);
+        
+      // Scales
+      const xScale = d3.scaleLinear()
+        .domain([0, maxX * 1.1])
+        .range([0, innerWidth]);
+        
+      const yScale = d3.scaleLinear()
+        .domain([0, maxY * 1.2])
+        .range([innerHeight, 0]);
+        
+      // Axes
+      const xAxis = d3.axisBottom(xScale).ticks(10);
+      const yAxis = d3.axisLeft(yScale).ticks(5);
       
-    ball.transition()
-      .duration(2000)
-      .ease(d3.easeLinear)
-      .attrTween('transform', function() {
-        return function(t) {
-          const idx = Math.floor(t * (data.length - 1));
-          if (idx >= data.length) return `translate(${xScale(data[data.length-1].x)},${yScale(data[data.length-1].y)})`;
-          const p = data[idx];
-          return `translate(${xScale(p.x)},${yScale(p.y)})`;
-        };
-      });
+      // Style axes based on theme
+      const axisColor = theme === 'dark' ? 'rgba(255,255,255,0.5)' : 'rgba(0,0,0,0.5)';
+      
+      svg.append('g')
+        .attr('transform', `translate(0,${innerHeight})`)
+        .call(xAxis)
+        .selectAll('text').style('fill', axisColor);
+        
+      svg.append('g')
+        .call(yAxis)
+        .selectAll('text').style('fill', axisColor);
+        
+      svg.selectAll('.domain, .tick line').style('stroke', axisColor);
+      
+      // Axis labels
+      svg.append('text')
+        .attr('x', innerWidth / 2)
+        .attr('y', innerHeight + 35)
+        .style('text-anchor', 'middle')
+        .style('fill', axisColor)
+        .style('font-size', '12px')
+        .text('Distância (m)');
+        
+      svg.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -innerHeight / 2)
+        .attr('y', -35)
+        .style('text-anchor', 'middle')
+        .style('fill', axisColor)
+        .style('font-size', '12px')
+        .text('Altura (m)');
+      
+      // Line generator
+      const line = d3.line<{ x: number; y: number }>()
+        .x(d => xScale(d.x))
+        .y(d => yScale(d.y))
+        .curve(d3.curveBasis);
+        
+      // Draw trajectory line
+      const path = svg.append('path')
+        .datum(data)
+        .attr('fill', 'none')
+        .attr('stroke', theme === 'dark' ? '#ccff00' : '#0055ff') // Neon or Azul
+        .attr('stroke-width', 3)
+        .attr('d', line);
+        
+      // Animate path
+      const totalLength = path.node()?.getTotalLength() || 0;
+      
+      path
+        .attr('stroke-dasharray', `${totalLength} ${totalLength}`)
+        .attr('stroke-dashoffset', totalLength)
+        .transition()
+        .duration(2000)
+        .ease(d3.easeLinear)
+        .attr('stroke-dashoffset', 0);
+        
+      // Add a moving ball
+      const ball = svg.append('circle')
+        .attr('r', 6)
+        .attr('fill', theme === 'dark' ? '#ccff00' : '#0055ff')
+        .attr('transform', `translate(${xScale(data[0].x)},${yScale(data[0].y)})`);
+        
+      ball.transition()
+        .duration(2000)
+        .ease(d3.easeLinear)
+        .attrTween('transform', function() {
+          return function(t) {
+            const idx = Math.floor(t * (data.length - 1));
+            if (idx >= data.length) return `translate(${xScale(data[data.length-1].x)},${yScale(data[data.length-1].y)})`;
+            const p = data[idx];
+            return `translate(${xScale(p.x)},${yScale(p.y)})`;
+          };
+        });
+    };
 
+    renderD3();
+
+    const handleResize = () => {
+      renderD3();
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, [velocity, angle, gravity, theme]);
 
   return (
     <section id="physics-playground" className="py-20 relative z-10">
-      <div className="max-w-6xl mx-auto px-6">
-        <div className="flex flex-col items-center mb-12">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col items-start mb-12">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-azul/30 bg-azul/10 text-xs font-bold tracking-widest text-neon mb-6 uppercase backdrop-blur-sm shadow-[0_0_15px_rgba(0,85,255,0.2)]">
             Laboratório Interativo
           </div>
-          <h2 className="text-3xl md:text-5xl font-black tracking-tighter mb-4 text-center">
+          <h2 className="text-3xl md:text-5xl font-black tracking-tighter mb-4">
             Playground de Física
           </h2>
-          <p className={`max-w-2xl text-center ${theme === 'dark' ? 'text-branco/60' : 'text-slate-600'}`}>
-            Explore a cinemática e as leis de movimento. Ajuste os parâmetros abaixo para simular a trajetória de um projétil utilizando D3.js.
-          </p>
         </div>
 
-        <div className={`rounded-2xl border ${theme === 'dark' ? 'border-white/10 bg-[#0d1520]' : 'border-black/5 bg-white'} shadow-2xl p-6 md:p-8 flex flex-col lg:flex-row gap-8`}>
+        <div className="flex flex-col lg:flex-row gap-12 items-center">
           
-          {/* Controls Sidebar */}
-          <div className="lg:w-1/3 flex flex-col gap-8">
-            <div>
+          {/* Controls & Explanation Sidebar */}
+          <div className="lg:w-1/3 flex flex-col gap-8 w-full">
+            <div className={`p-6 rounded-2xl border ${theme === 'dark' ? 'border-white/10 bg-[#0d1520]' : 'border-black/5 bg-white'} shadow-xl`}>
+              <p className={`text-sm mb-6 ${theme === 'dark' ? 'text-branco/60' : 'text-slate-600'}`}>
+                Explore a cinemática e as leis de movimento de Newton. Ajuste a velocidade inicial e o ângulo de lançamento para simular a trajetória de um projétil utilizando <strong>D3.js</strong> para renderização de dados em tempo real.
+              </p>
+              
               <h3 className="text-xl font-bold mb-6 flex items-center gap-2">
                 <Target className={theme === 'dark' ? 'text-neon' : 'text-azul'} /> Parâmetros
               </h3>
@@ -210,9 +221,9 @@ export function PhysicsPlayground() {
               </div>
             </div>
 
-            <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-branco/5 border-branco/10' : 'bg-black/5 border-black/10'}`}>
+            <div className={`p-5 rounded-xl border ${theme === 'dark' ? 'bg-branco/5 border-branco/10' : 'bg-black/5 border-black/10'} shadow-lg`}>
                <h4 className="text-sm font-bold tracking-widest uppercase mb-3 flex items-center gap-2">
-                 <MoveRight className={`w-4 h-4 ${theme === 'dark' ? 'text-neon' : 'text-azul'}`} /> Equações
+                 <MoveRight className={`w-4 h-4 ${theme === 'dark' ? 'text-neon' : 'text-azul'}`} /> Equações Cinemáticas
                </h4>
                <div className={`font-mono text-xs space-y-2 ${theme === 'dark' ? 'text-branco/60' : 'text-slate-600'}`}>
                  <p>x(t) = v₀ · cos(θ) · t</p>
@@ -222,7 +233,10 @@ export function PhysicsPlayground() {
           </div>
 
           {/* D3 Visualization Area */}
-          <div className="lg:w-2/3 flex flex-col min-h-[400px]">
+          <div 
+            className="lg:w-2/3 flex flex-col min-h-[300px] md:min-h-[450px] w-full relative"
+            style={{ WebkitMaskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)', maskImage: 'linear-gradient(to right, transparent, black 10%, black 90%, transparent)' }}
+          >
             <div 
               ref={d3Container} 
               className="w-full h-full flex-grow relative"

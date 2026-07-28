@@ -3,6 +3,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { Skills } from './components/Skills';
+import { Experience } from './components/Experience';
+import { Publications } from './components/Publications';
+import { Contact } from './components/Contact';
 import { HeroLeft } from './components/HeroLeft';
 import { VideoStyleRight } from './components/VideoStyleRight';
 import { BackgroundElements } from './components/BackgroundElements';
@@ -13,6 +17,7 @@ import { ThemeProvider } from './components/ThemeProvider';
 import { ThemeToggle } from './components/ThemeToggle';
 import { NavMenu } from './components/NavMenu';
 import { Footer } from './components/Footer';
+import { MobileFAB } from './components/MobileFAB';
 import { ReactLenis } from 'lenis/react';
 import { motion, useScroll, useSpring } from 'motion/react';
 
@@ -94,10 +99,15 @@ export default function App() {
         </motion.div>
 
         <Projects />
+        <Skills />
+        <Experience />
+        <Publications />
         <PhysicsPlayground />
+        <Contact />
       </div>
       
       <Footer />
+      <MobileFAB />
     </div>
   </ReactLenis>
 </ThemeProvider>
