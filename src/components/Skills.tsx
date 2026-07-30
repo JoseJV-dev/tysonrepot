@@ -30,6 +30,21 @@ export function Skills() {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.15
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 30 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+  };
+
   return (
     <section id="skills" className="py-20 relative z-10">
       <div className="flex flex-col items-center mb-16">
@@ -44,15 +59,18 @@ export function Skills() {
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <motion.div 
+        variants={containerVariants}
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: "-50px" }}
+        className="grid md:grid-cols-2 lg:grid-cols-4 gap-6"
+      >
         {skillCategories.map((category, idx) => (
           <motion.div
             key={category.title}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-50px" }}
-            transition={{ duration: 0.5, delay: idx * 0.1 }}
-            className={`p-6 rounded-2xl border ${isDark ? 'border-white/10 bg-[#0d1520]' : 'border-black/5 bg-white'} shadow-xl hover:border-azul/50 transition-colors duration-300 group`}
+            variants={itemVariants}
+            className={`p-6 rounded-[32px] bg-card border border-black/5 dark:border-white/5 shadow-sm hover:border-azul/50 transition-all duration-300 group`}
           >
             <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-6 shadow-md transition-transform group-hover:scale-110 ${isDark ? 'bg-chumbo text-neon border border-white/10' : 'bg-slate-100 text-azul border border-black/5'}`}>
               {category.icon}
@@ -68,7 +86,7 @@ export function Skills() {
             </ul>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }

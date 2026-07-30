@@ -1,21 +1,51 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Timer, Zap, Compass, BookOpen } from 'lucide-react';
+import { Timer, Zap, Compass, BookOpen, Sun, Moon, Sunrise } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 export function HeroLeft() {
   const { theme } = useTheme();
+  const [greeting, setGreeting] = useState('');
+  const [GreetingIcon, setGreetingIcon] = useState(() => Sun);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      setGreeting('Bom dia');
+      setGreetingIcon(() => Sunrise);
+    } else if (hour >= 12 && hour < 18) {
+      setGreeting('Boa tarde');
+      setGreetingIcon(() => Sun);
+    } else {
+      setGreeting('Boa noite');
+      setGreetingIcon(() => Moon);
+    }
+  }, []);
   
   return (
-    <div className="flex flex-col gap-6 lg:gap-8 pt-4">
+    <div className={`flex flex-col gap-6 lg:gap-8 h-full`}>
+      {/* Greeting */}
+      {greeting && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className={`flex items-center gap-2 text-sm md:text-base font-bold uppercase tracking-widest ${theme === 'dark' ? 'text-neon' : 'text-azul'}`}
+        >
+          <GreetingIcon className="w-5 h-5" />
+          <span>{greeting}</span>
+        </motion.div>
+      )}
+
       {/* Title */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-50px" }}
         transition={{ delay: 0.1, duration: 0.6 }}
-        className="text-5xl sm:text-7xl lg:text-[6.5rem] font-black leading-[0.9] tracking-tighter"
+        className="text-5xl sm:text-7xl lg:text-[5.5rem] font-black leading-[0.9] tracking-tighter"
       >
-        TYSON<br />
+        VETOR<br />
         <motion.span 
           initial={{ opacity: 0, scale: 0.8 }}
           whileInView={{ opacity: 1, scale: 1 }}
@@ -24,7 +54,7 @@ export function HeroLeft() {
           className="text-neon inline-block mt-2"
           style={{ filter: "drop-shadow(0 0 15px var(--theme-neon))" }}
         >
-          FERRY
+          ZERO
         </motion.span>
       </motion.div>
 

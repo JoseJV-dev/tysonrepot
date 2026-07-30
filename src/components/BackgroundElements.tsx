@@ -67,10 +67,10 @@ export function BackgroundElements() {
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-fixed">
       {/* Static Glows (using CSS instead of JS animation for better performance) */}
       <div 
-        className={`absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[120px] bg-azul ${theme === 'dark' ? 'opacity-[0.15]' : 'opacity-[0.05]'}`} 
+        className={`absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[120px] bg-azul ${theme === 'dark' ? 'opacity-[0.10]' : 'opacity-[0.03]'}`} 
       />
       <div 
-        className={`absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-[120px] bg-neon ${theme === 'dark' ? 'opacity-[0.10]' : 'opacity-[0.03]'}`} 
+        className={`absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-[120px] bg-neon ${theme === 'dark' ? 'opacity-[0.05]' : 'opacity-[0.02]'}`} 
       />
       
       {/* Floating Formulas - Drastically reduced for performance */}

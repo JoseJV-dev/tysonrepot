@@ -64,7 +64,7 @@ export function Publications() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5, delay: index * 0.1 }}
-            className={`p-6 md:p-8 rounded-2xl border ${isDark ? 'border-white/10 bg-[#0d1520]' : 'border-black/5 bg-white'} shadow-xl flex flex-col md:flex-row gap-6 md:items-center justify-between group hover:border-azul/50 transition-colors duration-300`}
+            className={`p-6 md:p-8 rounded-[32px] bg-card border border-black/5 dark:border-white/5 shadow-sm flex flex-col md:flex-row gap-6 md:items-center justify-between group hover:shadow-xl hover:border-azul/50 transition-all duration-300`}
           >
             <div className="flex items-start gap-5">
               <div className={`mt-1 w-12 h-12 shrink-0 rounded-full flex items-center justify-center ${isDark ? 'bg-chumbo text-neon border border-white/10' : 'bg-slate-100 text-azul border border-black/5'}`}>

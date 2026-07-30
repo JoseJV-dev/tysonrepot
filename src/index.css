@@ -1,23 +1,28 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Inter:wght@400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
 
 @theme {
   --color-chumbo: var(--theme-bg);
-  --color-azul: #0055FF;
-  --color-neon: var(--theme-neon);
+  --color-azul: var(--theme-primary);
+  --color-neon: var(--theme-accent);
   --color-branco: var(--theme-text);
+  --color-card: var(--theme-card-bg);
 }
 
 :root {
-  --theme-bg: #f0f4f8;
-  --theme-text: #0A1118;
-  --theme-neon: #0055FF;
+  --theme-bg: #F5F3EC;
+  --theme-text: #2D2D2A;
+  --theme-primary: #1C3D5A;
+  --theme-accent: #8BC34A;
+  --theme-card-bg: #FFFFFF;
 }
 
 .dark {
-  --theme-bg: #0A1118;
-  --theme-text: #FFFFFF;
-  --theme-neon: #CCFF00;
+  --theme-bg: #18191A;
+  --theme-text: #F5F3EC;
+  --theme-primary: #8BC34A;
+  --theme-accent: #8BC34A;
+  --theme-card-bg: #242526;
 }
 
 html.lenis, html.lenis body {
@@ -43,10 +48,14 @@ html.lenis, html.lenis body {
 body {
   background-color: var(--theme-bg);
   color: var(--theme-text);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Plus Jakarta Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.font-serif {
+  font-family: 'Playfair Display', serif;
 }
 
 ::selection {

@@ -66,7 +66,7 @@ export function Experience() {
 
               {/* Conteúdo */}
               <div className={`ml-12 md:ml-0 md:w-1/2 ${index % 2 === 0 ? 'md:pl-12' : 'md:pr-12 md:text-right'}`}>
-                <div className={`p-6 rounded-2xl border ${isDark ? 'border-white/10 bg-[#0d1520]' : 'border-black/5 bg-white'} shadow-xl relative group hover:border-azul/50 transition-colors duration-300`}>
+                <div className={`p-8 rounded-[32px] bg-card border border-black/5 dark:border-white/5 shadow-sm relative group hover:shadow-xl hover:border-azul/50 transition-all duration-300`}>
                   <div className={`flex items-center gap-2 mb-3 text-xs font-bold uppercase tracking-widest ${isDark ? 'text-neon' : 'text-azul'} ${index % 2 !== 0 && 'md:justify-end'}`}>
                     <Calendar className="w-4 h-4" />
                     <span>{item.date}</span>

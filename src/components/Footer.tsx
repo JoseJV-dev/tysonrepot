@@ -21,13 +21,11 @@ export function Footer() {
           {/* Brand Info */}
           <div className="lg:col-span-2 flex flex-col gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-azul flex items-center justify-center text-white shadow-[0_0_20px_rgba(0,85,255,0.4)]">
-                <Infinity size={28} />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-2xl font-black tracking-widest uppercase">Vetor <span className="text-neon">Zero</span></span>
-                <span className={`text-[10px] font-bold tracking-[0.3em] uppercase ${theme === 'dark' ? 'text-branco/50' : 'text-black/50'}`}>Matemática & Física</span>
-              </div>
+              <img 
+                src="/logo.png" 
+                alt="Vetor Zero" 
+                className="h-12 object-contain bg-white/90 p-1.5 rounded-lg"
+              />
             </div>
             <p className={`max-w-sm text-sm leading-relaxed ${theme === 'dark' ? 'text-branco/70' : 'text-slate-600'}`}>
               Desvendando a complexidade do universo através da lógica, números e tecnologia. Nossa missão é tornar a ciência acessível, fascinante e aplicável ao futuro.

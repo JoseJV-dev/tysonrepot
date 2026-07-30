@@ -6,7 +6,7 @@ export function VideoStyleRight() {
   const { theme } = useTheme();
 
   return (
-    <div className="flex flex-col gap-12 lg:pl-16 lg:border-l border-branco/10 pt-4 lg:pt-0">
+    <div className={`flex flex-col gap-12 h-full`}>
       
       {/* Header */}
       <motion.div 
@@ -25,7 +25,7 @@ export function VideoStyleRight() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6 }}
-        className={`relative ${theme === 'dark' ? 'bg-[#0d1520]' : 'bg-white'} rounded-[2rem] border ${theme === 'dark' ? 'border-white/5' : 'border-black/5'} p-6 md:p-8 flex flex-col gap-4 shadow-2xl`}
+        className="relative flex flex-col gap-4"
       >
         {/* Blue tag */}
         <div className="absolute top-6 left-0 bg-azul text-white text-[10px] md:text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-r-full flex items-center gap-2 shadow-[0_0_15px_rgba(0,85,255,0.4)] z-20">
@@ -76,7 +76,7 @@ export function VideoStyleRight() {
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className={`relative ${theme === 'dark' ? 'bg-[#0d1520]' : 'bg-white'} rounded-[2rem] border ${theme === 'dark' ? 'border-white/5' : 'border-black/5'} p-6 md:p-8 flex flex-col gap-4 shadow-2xl`}
+        className="relative flex flex-col gap-4 mt-8 md:mt-12"
       >
          {/* Blue tag */}
          <div className="absolute top-6 left-0 bg-azul text-white text-[10px] md:text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-r-full flex items-center gap-2 shadow-[0_0_15px_rgba(0,85,255,0.4)] z-20">
