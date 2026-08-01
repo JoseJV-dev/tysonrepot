@@ -1,92 +1,78 @@
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from 'motion/react';
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Check, GraduationCap, Code, Settings2, 
-  Phone, MessageCircle, Facebook, QrCode, Building2,
-  ChevronLeft, ChevronRight, X
-} from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
+import { Bot, Mail, Phone, MapPin, Building2, GraduationCap, ChevronLeft, ChevronRight, X, Cpu, Smartphone, Zap, Server } from 'lucide-react';
+import { cn } from '../lib/utils';
 import { useTheme } from './ThemeProvider';
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
-function useMediaQuery(query: string) {
-  const [matches, setMatches] = useState(false);
-  useEffect(() => {
-    const media = window.matchMedia(query);
-    if (media.matches !== matches) setMatches(media.matches);
-    const listener = () => setMatches(media.matches);
-    media.addEventListener('change', listener);
-    return () => media.removeEventListener('change', listener);
-  }, [matches, query]);
-  return matches;
-}
-
-type CardState = 'closed' | 'opening' | 'open';
+type RobotState = 'closed' | 'open';
 
 export function RobotCard() {
-  const [state, setState] = useState<CardState>('closed');
-  const isDesktop = useMediaQuery('(min-width: 1024px)'); // lg breakpoint
-  
-  // 0: Main Body, 1: Services, 2: Contacts
-  const [mobileCardIndex, setMobileCardIndex] = useState(0); 
-
+  const [state, setState] = useState<RobotState>('closed');
+  const [isDesktop, setIsDesktop] = useState(true);
+  const [mobileCardIndex, setMobileCardIndex] = useState(0); // 0 = main, 1 = services, 2 = contacts
   const ref = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const mouseXSpring = useSpring(x, { stiffness: 300, damping: 20 });
-  const mouseYSpring = useSpring(y, { stiffness: 300, damping: 20 });
-
-  const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
-  const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
-
   const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  
+  // Parallax motion values
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Smooth springs for rotation
+  const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [15, -15]), { stiffness: 150, damping: 20 });
+  const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-15, 15]), { stiffness: 150, damping: 20 });
 
   useEffect(() => {
-    if (state === 'open' && !isDesktop) {
-      document.body.style.overflow = 'hidden';
-      window.dispatchEvent(new CustomEvent('robotStateChange', { detail: { isOpen: true } }));
-    } else {
-      document.body.style.overflow = '';
-      window.dispatchEvent(new CustomEvent('robotStateChange', { detail: { isOpen: false } }));
-    }
-    return () => {
-      document.body.style.overflow = '';
-      window.dispatchEvent(new CustomEvent('robotStateChange', { detail: { isOpen: false } }));
+    const handleResize = () => {
+      const desktop = window.innerWidth >= 1024;
+      setIsDesktop(desktop);
+      if (!desktop && state === 'open') {
+        // Reset to main card if switching to mobile view while open
+        setMobileCardIndex(0);
+      }
     };
-  }, [state, isDesktop]);
+    
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, [state]);
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    if (!ref.current || state !== 'closed') return; // Only tilt when closed
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!ref.current || state === 'open') {
+      mouseX.set(0);
+      mouseY.set(0);
+      return;
+    }
     const rect = ref.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    x.set(mouseX / width - 0.5);
-    y.set(mouseY / height - 0.5);
+    const x = (e.clientX - rect.left) / rect.width - 0.5;
+    const y = (e.clientY - rect.top) / rect.height - 0.5;
+    mouseX.set(x);
+    mouseY.set(y);
   };
 
   const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
+    mouseX.set(0);
+    mouseY.set(0);
   };
 
   const handleToggle = () => {
     if (state === 'closed') {
       setState('open');
-      setMobileCardIndex(0);
-      x.set(0);
-      y.set(0);
-    } else {
+      mouseX.set(0);
+      mouseY.set(0);
+      const event = new CustomEvent('robotStateChange', { detail: { isOpen: true } });
+      window.dispatchEvent(event);
+    } else if (isDesktop) {
+      // Only close by clicking the main body on desktop
       setState('closed');
+      const event = new CustomEvent('robotStateChange', { detail: { isOpen: false } });
+      window.dispatchEvent(event);
     }
+  };
+
+  const closeMobile = () => {
+    setState('closed');
+    const event = new CustomEvent('robotStateChange', { detail: { isOpen: false } });
+    window.dispatchEvent(event);
   };
 
   const nextCard = (e: React.MouseEvent) => {
@@ -99,164 +85,204 @@ export function RobotCard() {
     setMobileCardIndex((prev) => (prev - 1 + 3) % 3);
   };
 
-  // Content renderers
+  const isDark = theme === 'dark';
+
   const renderServices = () => (
     <div className="flex flex-col gap-6">
-      <h3 className={`font-bold text-lg tracking-tight uppercase border-b-2 pb-2 ${isDark ? 'text-[#00a8ff] border-[#00a8ff]/20' : 'text-[#0055a4] border-[#0055a4]/20'}`}>Nossos Serviços</h3>
+      <h3 className={`font-bold text-lg tracking-tight uppercase border-b-2 pb-2 ${isDark ? 'text-neon border-neon/20' : 'text-[#0055a4] border-[#0055a4]/20'}`}>Nossas Soluções</h3>
       
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-xl text-white ${isDark ? 'bg-[#00a8ff]' : 'bg-[#0055a4]'}`}><Building2 size={20} /></div>
+        <div className={`p-2 rounded-xl text-chumbo ${isDark ? 'bg-neon' : 'bg-[#0055a4] text-white'}`}><Smartphone size={20} /></div>
         <div>
-          <h4 className={`font-bold text-sm leading-tight ${isDark ? 'text-white' : ''}`}>ATL EM CASA</h4>
-          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Formação e apoio escolar em casa</p>
+          <h4 className={`font-bold text-sm leading-tight ${isDark ? 'text-white' : ''}`}>KINA SERVICE</h4>
+          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Digitalização de restaurantes e menus.</p>
         </div>
       </div>
       
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-xl text-white ${isDark ? 'bg-[#00a8ff]' : 'bg-[#0055a4]'}`}><GraduationCap size={20} /></div>
+        <div className={`p-2 rounded-xl text-chumbo ${isDark ? 'bg-neon' : 'bg-[#0055a4] text-white'}`}><Server size={20} /></div>
         <div>
-          <h4 className={`font-bold text-sm leading-tight ${isDark ? 'text-white' : ''}`}>FORMAÇÃO</h4>
-          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Cursos e treinamentos profissionalizantes</p>
+          <h4 className={`font-bold text-sm leading-tight ${isDark ? 'text-white' : ''}`}>VETOR GRID</h4>
+          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Gestão Inteligente da Rede Elétrica.</p>
         </div>
       </div>
       
       <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-xl text-white ${isDark ? 'bg-[#00a8ff]' : 'bg-[#0055a4]'}`}><Code size={20} /></div>
+        <div className={`p-2 rounded-xl text-chumbo ${isDark ? 'bg-neon' : 'bg-[#0055a4] text-white'}`}><Zap size={20} /></div>
         <div>
-          <h4 className={`font-bold text-sm leading-tight text-[11px] ${isDark ? 'text-white' : ''}`}>DESENVOLVIMENTO DE PROJECTO</h4>
-          <p className={`text-[10px] mt-1 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Soluções tecnológicas personalizadas</p>
-        </div>
-      </div>
-      
-      <div className="flex items-start gap-3">
-        <div className={`p-2 rounded-xl text-white ${isDark ? 'bg-[#00a8ff]' : 'bg-[#0055a4]'}`}><Settings2 size={20} /></div>
-        <div>
-          <h4 className={`font-bold text-sm leading-tight ${isDark ? 'text-white' : ''}`}>PRESTAÇÃO DE SERVIÇO</h4>
-          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Suporte técnico especializado</p>
+          <h4 className={`font-bold text-sm leading-tight ${isDark ? 'text-white' : ''}`}>BOLT</h4>
+          <p className={`text-xs mt-1 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>O assistente virtual académico gamificado.</p>
         </div>
       </div>
     </div>
   );
 
   const renderContacts = () => (
-    <div className="flex flex-col gap-6">
-      <h3 className={`font-bold text-lg tracking-tight uppercase border-b-2 pb-2 ${isDark ? 'text-[#00a8ff] border-[#00a8ff]/20' : 'text-[#0055a4] border-[#0055a4]/20'}`}>Contactos</h3>
-      
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-full text-white ${isDark ? 'bg-[#00a8ff]' : 'bg-[#0055a4]'}`}><MessageCircle size={18} /></div>
-        <div>
-          <h4 className={`font-bold text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>WhatsApp</h4>
-          <p className={`text-sm font-bold ${isDark ? 'text-white' : ''}`}>943 803 380</p>
+    <div className="flex flex-col gap-6 h-full justify-between">
+      <div>
+        <h3 className={`font-bold text-lg tracking-tight uppercase border-b-2 pb-2 mb-6 ${isDark ? 'text-neon border-neon/20' : 'text-[#0055a4] border-[#0055a4]/20'}`}>Fale Connosco</h3>
+        
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full border ${isDark ? 'border-white/10 text-white' : 'border-slate-200 text-slate-700'}`}><Mail size={16} /></div>
+            <a href="mailto:info@vetorzero.co.mz" className={`text-sm font-medium hover:underline ${isDark ? 'text-gray-300' : 'text-slate-600'}`}>info@vetorzero.co.mz</a>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full border ${isDark ? 'border-white/10 text-white' : 'border-slate-200 text-slate-700'}`}><Phone size={16} /></div>
+            <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-slate-600'}`}>+258 84 000 0000</p>
+          </div>
+          
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full border ${isDark ? 'border-white/10 text-white' : 'border-slate-200 text-slate-700'}`}><MapPin size={16} /></div>
+            <p className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-slate-600'}`}>Luanda, Angola</p>
+          </div>
         </div>
       </div>
       
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-full text-white ${isDark ? 'bg-[#00a8ff]' : 'bg-[#0055a4]'}`}><Phone size={18} /></div>
-        <div>
-          <h4 className={`font-bold text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Chamadas</h4>
-          <p className={`text-xs font-bold leading-tight ${isDark ? 'text-white' : ''}`}>(+244) 943 803 380<br/>951 567 980</p>
-        </div>
-      </div>
-      
-      <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-full text-white ${isDark ? 'bg-[#00a8ff]' : 'bg-[#0055a4]'}`}><Facebook size={18} /></div>
-        <div>
-          <h4 className={`font-bold text-xs ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>Facebook</h4>
-          <p className={`text-xs font-bold ${isDark ? 'text-white' : ''}`}>Vetor Zero Oficial</p>
-        </div>
-      </div>
-      
-      <div className={`mt-4 pt-4 border-t flex flex-col items-center ${isDark ? 'border-white/10' : 'border-slate-200'}`}>
-        <div className={`w-24 h-24 p-1 border rounded flex items-center justify-center ${isDark ? 'bg-[#242526] border-white/10' : 'bg-white border-slate-200'}`}>
-          <QrCode size={64} className={isDark ? 'text-[#00a8ff]' : 'text-[#003366]'}/>
-        </div>
-        <p className={`text-[10px] font-bold text-center mt-2 ${isDark ? 'text-gray-400' : 'text-slate-500'}`}>ESCANIE O QR CODE<br/>e fale connosco!</p>
-      </div>
+      <a 
+        href="#contact" 
+        onClick={(e) => {
+           if(state === 'open') {
+             closeMobile();
+           }
+        }}
+        className={`w-full py-3 rounded-xl font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-transform active:scale-95 ${
+          isDark 
+            ? 'bg-white text-[#18191A] hover:bg-white/90' 
+            : 'bg-slate-900 text-white hover:bg-slate-800'
+        }`}
+      >
+        <span>Solicitar Orçamento</span>
+        <ChevronRight size={16} />
+      </a>
     </div>
   );
 
-  const renderMainBody = (isMobileOverlay = false) => (
-    <>
-      {/* Robot Head (Only visible when open, not in mobile overlay unless wanted, let's keep it in both) */}
-      <motion.div
-        initial={false}
-        animate={{ 
-          y: (state === 'open' || isMobileOverlay) ? -60 : 20, 
-          opacity: (state === 'open' || isMobileOverlay) ? 1 : 0 
-        }}
-        transition={{ duration: 0.6, type: "spring" }}
-        className="absolute -top-16 w-32 h-20 bg-gradient-to-b from-[#003a70] to-[#001122] rounded-t-3xl border-t-4 border-l-4 border-r-4 border-[#0055a4] flex items-center justify-center gap-4 z-0 shadow-[inset_0_2px_5px_rgba(255,255,255,0.4),0_-5px_15px_rgba(0,168,255,0.3)] overflow-hidden"
-      >
-        {/* Eyes */}
-        <div className="w-5 h-5 bg-[#00a8ff] rounded-full shadow-[0_0_15px_#00a8ff] animate-pulse relative">
-          <div className="absolute inset-1 bg-white/40 rounded-full" />
+  const renderMainBody = (isMobileView: boolean = false) => (
+    <div 
+      className={cn(
+        "relative flex flex-col justify-between p-6 transform-style-3d border shadow-2xl transition-colors duration-300",
+        state === 'closed' ? "w-[240px] h-[360px] rounded-[2rem]" : "w-[280px] h-[400px] rounded-[2rem]",
+        isDark ? 'bg-[#18191A] border-white/10' : 'bg-slate-50 border-slate-200'
+      )}
+      style={{
+        transform: state === 'closed' ? "translateZ(30px)" : "translateZ(0px)"
+      }}
+    >
+      {/* Bot Header */}
+      <div className="flex justify-between items-start z-10" style={{ transform: "translateZ(40px)" }}>
+        <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner border ${isDark ? 'bg-[#242526] border-white/10' : 'bg-white border-slate-200'}`}>
+          <Cpu className={isDark ? 'text-neon' : 'text-[#0055a4]'} size={24} />
         </div>
-        <div className="w-5 h-5 bg-[#00a8ff] rounded-full shadow-[0_0_15px_#00a8ff] animate-pulse relative">
-          <div className="absolute inset-1 bg-white/40 rounded-full" />
+        <div className={`px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border ${isDark ? 'bg-[#242526] text-neon border-neon/20' : 'bg-white text-[#0055a4] border-[#0055a4]/20'}`}>
+          {state === 'closed' ? 'V-ZERO v1.0' : 'SISTEMA ATIVO'}
         </div>
-      </motion.div>
+      </div>
 
-      {/* Main Shield / Body */}
+      {/* Bot Face / Visual Area */}
       <div 
-        style={{ transform: (state === 'closed' && !isMobileOverlay) ? "translateZ(40px)" : "translateZ(0px)" }}
-        className={cn(
-        "relative w-[280px] h-[360px] bg-gradient-to-b from-[#003a70] via-[#002244] to-[#000a14] rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.7),inset_0_2px_3px_rgba(255,255,255,0.3),inset_0_-4px_10px_rgba(0,0,0,0.8)] flex flex-col items-center justify-center p-8 border border-[#0055a4]/30 z-20 transition-all duration-500 overflow-hidden",
-        (state === 'open' || isMobileOverlay) && (isDark ? "bg-gradient-to-b from-[#18191A] via-[#242526] to-[#0d1520] border-white/10 shadow-[0_20px_50px_rgba(0,168,255,0.1)]" : "bg-gradient-to-b from-white via-slate-50 to-slate-200 shadow-[0_20px_50px_rgba(0,168,255,0.2),inset_0_2px_3px_rgba(255,255,255,1),inset_0_-4px_10px_rgba(0,0,0,0.1)] border-white/80")
-      )}>
-        {/* Glossy overlay */}
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20 pointer-events-none rounded-3xl z-30" />
-        
-        {/* Circuit pattern overlay for realism */}
-        <div 
-          className="absolute inset-0 opacity-10 pointer-events-none z-0 mix-blend-overlay"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M0 0h40v40H0V0zm20 20h20v20H20V20zM0 20h20v20H0V20z' fill='%23ffffff' fill-opacity='0.4' fill-rule='evenodd'/%3E%3C/svg%3E")`
+        className="flex-1 flex flex-col items-center justify-center relative my-4 z-10"
+        style={{ transform: "translateZ(20px)" }}
+      >
+        <motion.div 
+          animate={{ 
+            scale: state === 'open' ? 1.1 : 1,
+            y: state === 'open' ? -10 : 0
           }}
-        />
-        
-        {/* Logo Container */}
-        <div className="relative mb-6 z-20">
-           <svg viewBox="0 0 100 100" className="w-24 h-24 drop-shadow-xl transition-colors duration-500" style={{ color: (state === 'open' || isMobileOverlay) ? '#0055a4' : '#00a8ff' }}>
-             <path d="M 18 40 A 35 35 0 0 0 82 40" stroke="currentColor" strokeWidth="10" fill="none" strokeLinecap="round" className={(state === 'closed' && !isMobileOverlay) ? "drop-shadow-[0_0_8px_#00a8ff]" : ""} />
-             <path d="M 5 20 L 95 20 L 50 85 Z M 30 35 L 70 35 L 50 65 Z" fill="currentColor" fillRule="evenodd" className={(state === 'closed' && !isMobileOverlay) ? "drop-shadow-[0_0_12px_#00a8ff]" : ""} />
-             <rect x="12" y="20" width="4" height="20" fill="currentColor" />
-             <circle cx="14" cy="44" r="6" fill="currentColor" />
-           </svg>
-        </div>
-        
-        <h2 className={cn(
-          "text-3xl font-black tracking-widest text-center transition-colors duration-300 flex items-center gap-1.5",
-          (state === 'open' || isMobileOverlay) ? (isDark ? "text-white" : "text-[#003366]") : "text-white"
-        )}>
-          <span>VETOR</span>
-          <span className={(state === 'open' || isMobileOverlay) ? (isDark ? "text-[#00a8ff]" : "text-slate-800") : "text-neon"}>ZERO</span>
-        </h2>
-        <div className={cn("h-[2px] w-full my-2", (state === 'open' || isMobileOverlay) ? (isDark ? "bg-[#00a8ff]/30" : "bg-[#0055a4]/50") : "bg-azul")}></div>
-        <p className={cn(
-          "text-[10px] uppercase font-bold tracking-[0.2em] text-center transition-colors duration-300",
-          (state === 'open' || isMobileOverlay) ? (isDark ? "text-[#00a8ff]" : "text-[#0055a4]") : "text-azul"
-        )}>
-          Educação e Tecnologia
-        </p>
+          transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          className="relative"
+        >
+          {/* Eyes/Core */}
+          <div className="flex gap-4 items-center justify-center relative">
+            <div className={`w-8 h-8 rounded-full shadow-[inset_0_0_10px_rgba(0,0,0,0.5)] flex items-center justify-center ${isDark ? 'bg-[#0f0f12]' : 'bg-slate-200'}`}>
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1] }} 
+                transition={{ duration: 2, repeat: Infinity }}
+                className={`w-3 h-3 rounded-full ${isDark ? 'bg-neon shadow-[0_0_15px_var(--theme-neon)]' : 'bg-[#0055a4] shadow-[0_0_10px_rgba(0,85,164,0.5)]'}`} 
+              />
+            </div>
+            <div className={`w-8 h-8 rounded-full shadow-[inset_0_0_10px_rgba(0,0,0,0.5)] flex items-center justify-center ${isDark ? 'bg-[#0f0f12]' : 'bg-slate-200'}`}>
+              <motion.div 
+                animate={{ scale: [1, 1.2, 1] }} 
+                transition={{ duration: 2, repeat: Infinity, delay: 0.2 }}
+                className={`w-3 h-3 rounded-full ${isDark ? 'bg-neon shadow-[0_0_15px_var(--theme-neon)]' : 'bg-[#0055a4] shadow-[0_0_10px_rgba(0,85,164,0.5)]'}`} 
+              />
+            </div>
+          </div>
+          
+          {/* Decorative lines around face */}
+          <div className={`absolute top-1/2 -left-8 w-6 h-0.5 -translate-y-1/2 ${isDark ? 'bg-white/10' : 'bg-slate-300'}`} />
+          <div className={`absolute top-1/2 -right-8 w-6 h-0.5 -translate-y-1/2 ${isDark ? 'bg-white/10' : 'bg-slate-300'}`} />
+        </motion.div>
 
-        <p className={cn(
-          "text-xs text-center mt-8 font-medium leading-relaxed max-w-[200px] transition-colors duration-300",
-          (state === 'open' || isMobileOverlay) ? (isDark ? "text-gray-300" : "text-slate-600") : "text-slate-300"
-        )}>
-          Ciência, Tecnologia e Educação para o Futuro.
-        </p>
-        
-        {(state === 'closed' && !isMobileOverlay) && (
-          <p className="absolute bottom-6 text-xs text-white/50 uppercase tracking-widest animate-pulse">
-            Clique para abrir
-          </p>
+        {state === 'open' && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="mt-8 text-center"
+          >
+            <p className={`text-xs font-bold tracking-widest uppercase mb-1 ${isDark ? 'text-neon' : 'text-[#0055a4]'}`}>A PRIMEIRA FÓRMULA</p>
+            <h3 className={`text-xl font-black ${isDark ? 'text-white' : 'text-slate-800'}`}>Vetor Zero</h3>
+          </motion.div>
         )}
       </div>
-    </>
+
+      {/* Bot Footer / Actions */}
+      <div className="z-10" style={{ transform: "translateZ(30px)" }}>
+        {state === 'closed' ? (
+          <div className={`w-full py-3 rounded-xl border flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-widest ${isDark ? 'bg-[#242526] border-white/10 text-white' : 'bg-white border-slate-200 text-slate-700'}`}>
+            <span>Interagir</span>
+            <motion.div
+              animate={{ x: [0, 5, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <ChevronRight size={16} className={isDark ? 'text-neon' : 'text-[#0055a4]'} />
+            </motion.div>
+          </div>
+        ) : (
+          <div className="flex gap-2">
+            {!isDesktop && (
+              <button 
+                onClick={(e) => { e.stopPropagation(); closeMobile(); }}
+                className={`flex-1 py-3 rounded-xl border flex flex-col items-center justify-center text-[10px] font-bold uppercase tracking-widest ${isDark ? 'bg-[#242526] border-white/10 text-white hover:bg-white/5' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+              >
+                <X size={18} className="mb-1" />
+                Fechar
+              </button>
+            )}
+            <button 
+              onClick={(e) => {
+                 e.stopPropagation();
+                 const contactSection = document.getElementById('contact');
+                 if(contactSection) {
+                    contactSection.scrollIntoView({ behavior: 'smooth' });
+                    closeMobile();
+                 }
+              }}
+              className={`flex-1 py-3 rounded-xl border flex flex-col items-center justify-center text-[10px] font-bold uppercase tracking-widest ${isDark ? 'bg-neon border-neon text-chumbo' : 'bg-[#0055a4] border-[#0055a4] text-white'}`}
+            >
+              <Mail size={18} className="mb-1" />
+              Email
+            </button>
+            <button 
+              className={`flex-1 py-3 rounded-xl border flex flex-col items-center justify-center text-[10px] font-bold uppercase tracking-widest ${isDark ? 'bg-neon border-neon text-chumbo' : 'bg-[#0055a4] border-[#0055a4] text-white'}`}
+            >
+              <Phone size={18} className="mb-1" />
+              Ligar
+            </button>
+          </div>
+        )}
+      </div>
+      
+      {/* Edge Highlights */}
+      <div className={`absolute inset-0 rounded-[2rem] border-2 pointer-events-none z-20 ${isDark ? 'border-white/5' : 'border-black/5'}`} style={{ transform: "translateZ(1px)" }} />
+    </div>
   );
 
   return (
     <>
+      {/* Mobile Modal Overlay */}
       <AnimatePresence>
         {state === 'open' && !isDesktop && (
           <motion.div
@@ -267,7 +293,7 @@ export function RobotCard() {
             className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-center p-6"
           >
             <button
-              onClick={() => setState('closed')}
+              onClick={() => closeMobile()}
               className="absolute top-6 right-6 w-12 h-12 rounded-full flex items-center justify-center bg-white/10 text-white border border-white/20 shadow-lg"
             >
               <X className="w-6 h-6" />
@@ -325,7 +351,7 @@ export function RobotCard() {
                   key={idx} 
                   className={`h-2 rounded-full transition-all ${
                     idx === mobileCardIndex 
-                      ? 'w-6 bg-[#00a8ff]' 
+                      ? 'w-6 bg-neon' 
                       : 'w-2 bg-white/30'
                   }`}
                 />
@@ -380,9 +406,9 @@ export function RobotCard() {
               scale: 1,
               y: 0
             }}
-            style={{
-               rotateX: rotateX,
-               rotateY: rotateY,
+            style={{ 
+               rotateX: rotateX, 
+               rotateY: rotateY, 
                transformStyle: "preserve-3d"
             }}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
@@ -395,20 +421,21 @@ export function RobotCard() {
               "absolute opacity-0 group-hover:opacity-100 transition-all duration-300 pointer-events-none z-50",
               state === 'closed' ? "-top-14" : "-bottom-14"
             )}>
-              <div className="bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-[0_0_20px_rgba(0,168,255,0.2)] whitespace-nowrap border border-white/10 flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-[#00a8ff] animate-pulse" />
+              <div className={`text-xs font-bold px-4 py-2.5 rounded-xl whitespace-nowrap border flex items-center gap-2 ${isDark ? 'bg-slate-900 text-white shadow-[0_0_20px_rgba(57,255,20,0.2)] border-white/10' : 'bg-white text-slate-800 shadow-lg border-slate-200'}`}>
+                <span className={`w-2 h-2 rounded-full animate-pulse ${isDark ? 'bg-neon' : 'bg-[#0055a4]'}`} />
                 {state === 'closed' ? 'Clique para interagir com o robô' : 'Clique para recolher o painel'}
               </div>
               <div className={cn(
-                "w-2.5 h-2.5 bg-slate-900 border-white/10 transform rotate-45 absolute left-1/2 -translate-x-1/2",
-                state === 'closed' ? "border-b border-r -bottom-[5px]" : "border-t border-l -top-[5px]"
+                "w-2.5 h-2.5 transform rotate-45 absolute left-1/2 -translate-x-1/2",
+                state === 'closed' ? "border-b border-r -bottom-[5px]" : "border-t border-l -top-[5px]",
+                isDark ? 'bg-slate-900 border-white/10' : 'bg-white border-slate-200'
               )} />
             </div>
 
             {/* Dynamic Hover Drop Shadow */}
             <div 
               style={{ transform: "translateZ(-20px)" }}
-              className="absolute inset-0 top-0 bg-[#00a8ff]/30 blur-[50px] rounded-3xl opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 z-10 pointer-events-none" 
+              className={`absolute inset-0 top-0 blur-[50px] rounded-3xl opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700 z-10 pointer-events-none ${isDark ? 'bg-neon/30' : 'bg-[#0055a4]/20'}`} 
             />
 
             {renderMainBody(false)}
@@ -432,7 +459,6 @@ export function RobotCard() {
               {renderContacts()}
             </motion.div>
           )}
-
         </div>
       </motion.div>
     </>

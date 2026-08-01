@@ -1,22 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { MessageCircle, Home, Briefcase, Phone, Plus, X, BookOpen } from 'lucide-react';
+import { MessageCircle, Home, Briefcase, Phone, Plus, X, Target, Lightbulb, Map } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 
 export function MobileFAB() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isRobotOpen, setIsRobotOpen] = useState(false);
   const { theme } = useTheme();
 
+  useEffect(() => {
+    const handleRobotState = (e: Event) => {
+      const customEvent = e as CustomEvent;
+      setIsRobotOpen(customEvent.detail.isOpen);
+      if (customEvent.detail.isOpen) setIsOpen(false);
+    };
+    window.addEventListener('robotStateChange', handleRobotState);
+    return () => window.removeEventListener('robotStateChange', handleRobotState);
+  }, []);
+
   const actions = [
-    { id: 'contact', icon: Phone, label: 'Contato', href: '#contact' },
-    { id: 'publications', icon: BookOpen, label: 'Publicações', href: '#publications' },
-    { id: 'projects', icon: Briefcase, label: 'Projetos', href: '#projects' },
+    { id: 'contact', icon: Phone, label: 'Contacto', href: '#contact' },
+    { id: 'sobre', icon: Target, label: 'Sobre', href: '#sobre' },
+    { id: 'solucoes', icon: Briefcase, label: 'Soluções', href: '#solucoes' },
+    { id: 'desafios', icon: Map, label: 'Desafios', href: '#desafios' },
+    { id: 'fazemos', icon: Lightbulb, label: 'O Que Fazemos', href: '#fazemos' },
     { id: 'home', icon: Home, label: 'Início', href: '#home' },
   ];
 
   const handleToggle = () => setIsOpen(!isOpen);
 
   const isDark = theme === 'dark';
+
+  if (isRobotOpen) return null;
 
   return (
     <div className="fixed bottom-6 right-6 z-[110] md:hidden flex flex-col items-end gap-4">
@@ -43,12 +58,12 @@ export function MobileFAB() {
                   className="flex items-center gap-3 group"
                 >
                   <span className={`text-xs font-bold px-3 py-1.5 rounded-lg shadow-lg ${
-                    isDark ? "bg-[#0d1520] text-branco border border-branco/10" : "bg-white text-slate-800 border border-black/5"
+                    isDark ? "bg-[#242526] text-branco border border-white/10" : "bg-white text-slate-800 border border-black/5"
                   }`}>
                     {action.label}
                   </span>
                   <div className={`w-12 h-12 rounded-full flex items-center justify-center shadow-lg transition-transform active:scale-95 ${
-                    isDark ? "bg-[#0d1520] border border-branco/10 text-neon" : "bg-white border border-black/5 text-azul"
+                    isDark ? "bg-[#242526] border border-white/10 text-neon" : "bg-white border border-black/5 text-azul"
                   }`}>
                     <Icon className="w-5 h-5" />
                   </div>
@@ -62,8 +77,8 @@ export function MobileFAB() {
       <motion.button
         onClick={handleToggle}
         whileTap={{ scale: 0.9 }}
-        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(0,168,255,0.4)] transition-colors ${
-          isDark ? "bg-azul text-white hover:bg-[#003a70]" : "bg-azul text-white hover:bg-[#003a70]"
+        className={`w-14 h-14 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(57,255,20,0.4)] transition-colors ${
+          isDark ? "bg-neon text-chumbo hover:bg-white" : "bg-azul text-white hover:bg-[#003a70]"
         }`}
       >
         <motion.div

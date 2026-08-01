@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useTheme } from './ThemeProvider';
-import { ThemeToggle } from './ThemeToggle';
+import { NavMenu } from './NavMenu';
 
 export function StickyHeader() {
   const [isVisible, setIsVisible] = useState(false);
@@ -42,17 +42,28 @@ export function StickyHeader() {
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
           className="fixed top-4 left-0 right-0 z-[90] flex justify-center px-4"
         >
-          <div className={`w-full max-w-[1400px] flex justify-between items-center px-6 py-3 rounded-[24px] shadow-lg border ${theme === 'dark' ? 'bg-[#242526]/90 border-white/10' : 'bg-white/90 border-black/10'} backdrop-blur-md`}>
+          <div className={`w-full max-w-[1400px] flex justify-between items-center px-6 py-3 rounded-[24px] shadow-lg border ${theme === 'dark' ? 'bg-[#242526]/90 border-white/10' : 'bg-white/90 border-slate-200'} backdrop-blur-md`}>
+            
             <div className="flex items-center gap-3">
-              <img src="/logo.png" alt="Vetor Zero" className="h-8 object-contain" />
-              <span className="font-bold text-base md:text-lg tracking-tight hidden sm:block">VETOR ZERO</span>
+              {/* VETOR ZERO LOGO SVG */}
+              <svg width="24" height="24" viewBox="0 0 100 110" className="shrink-0">
+                <polygon 
+                  points="50,5 95,30 95,80 50,105 5,80 5,30" 
+                  fill="transparent" 
+                  stroke="#00a8ff" 
+                  strokeWidth="8"
+                  strokeLinejoin="round"
+                />
+                <path 
+                  d="M 30 45 L 50 80 L 70 45 L 60 45 L 50 65 L 40 45 Z" 
+                  fill={theme === 'dark' ? '#ffffff' : '#1A1A1D'} 
+                />
+              </svg>
+              <span className={`font-bold text-base md:text-lg tracking-tight hidden lg:block uppercase ${theme === 'dark' ? 'text-white' : 'text-chumbo'}`}>VETOR ZERO</span>
             </div>
-            <div className="flex items-center gap-4">
-              <button className={`px-5 py-2.5 rounded-full text-xs md:text-sm font-semibold transition-colors ${theme === 'dark' ? 'bg-white text-black hover:bg-gray-200' : 'bg-[#2D2D2A] text-white hover:bg-black'}`}>
-                Agendar Reunião
-              </button>
-              <ThemeToggle />
-            </div>
+
+            <NavMenu />
+
           </div>
         </motion.div>
       )}

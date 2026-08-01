@@ -6,7 +6,7 @@ export function Footer() {
   const { theme } = useTheme();
   
   return (
-    <footer className={`relative overflow-hidden pt-24 pb-12 border-t ${theme === 'dark' ? 'border-branco/10 bg-[#060a10]' : 'border-black/5 bg-slate-100'} mt-20`}>
+    <footer className={`relative overflow-hidden pt-24 pb-12 border-t ${theme === 'dark' ? 'border-white/10 bg-[#060a10]' : 'border-black/5 bg-slate-100'} mt-20`}>
       
       {/* Background Math Elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none flex items-center justify-center opacity-20">
@@ -52,13 +52,13 @@ export function Footer() {
             </a>
             
             <div className="flex items-center gap-4 mt-2">
-              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-branco/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="LinkedIn">
+              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="LinkedIn">
                 <Linkedin className="w-4 h-4" />
               </a>
-              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-branco/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="GitHub">
+              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="GitHub">
                 <Github className="w-4 h-4" />
               </a>
-              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-branco/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="Twitter">
+              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="Twitter">
                 <Twitter className="w-4 h-4" />
               </a>
             </div>
@@ -66,10 +66,10 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium tracking-wide ${theme === 'dark' ? 'border-branco/10 text-branco/40' : 'border-black/10 text-slate-500'}`}>
+        <div className={`pt-8 border-t flex flex-col md:flex-row items-center justify-between gap-4 text-xs font-medium tracking-wide ${theme === 'dark' ? 'border-white/10 text-branco/40' : 'border-black/10 text-slate-500'}`}>
           <p>© {new Date().getFullYear()} Prof. Tyson Ferry. Todos os direitos reservados.</p>
           <div className="flex items-center gap-6">
-            <span className="flex items-center gap-1">Desenvolvido com <span className="text-neon animate-pulse">■</span> Lógica</span>
+            <span className="flex items-center gap-1">Desenvolvido com <span className="text-azul dark:text-neon animate-pulse">■</span> Lógica</span>
             <span className="flex items-center gap-1">Baseado em <span className="text-azul font-serif font-black text-sm">π</span></span>
           </div>
         </div>

@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Plus+Jakarta+Sans:wght@400;500;700;800&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap');
 @import "tailwindcss";
+@custom-variant dark (&:is(.dark *));
 
 @theme {
   --color-chumbo: var(--theme-bg);
@@ -10,18 +11,26 @@
 }
 
 :root {
-  --theme-bg: #F5F3EC;
-  --theme-text: #2D2D2A;
-  --theme-primary: #1C3D5A;
-  --theme-accent: #8BC34A;
-  --theme-card-bg: #FFFFFF;
+  --theme-bg: #1A1A1D; /* Cinza Chumbo */
+  --theme-text: #FFFFFF; /* Branco */
+  --theme-primary: #0055a4; /* Azul Tecnológico */
+  --theme-accent: #39FF14; /* Verde Neon */
+  --theme-card-bg: #242526;
+}
+
+.light {
+  --theme-bg: #F4F6F8; /* Soft light gray background */
+  --theme-text: #1A1A1D; /* Dark text for readability */
+  --theme-primary: #0055a4; /* Azul Tecnológico */
+  --theme-accent: #059669; /* Emerald 600 - darker green for readability on light */
+  --theme-card-bg: #FFFFFF; /* Crisp white for cards */
 }
 
 .dark {
-  --theme-bg: #18191A;
-  --theme-text: #F5F3EC;
-  --theme-primary: #8BC34A;
-  --theme-accent: #8BC34A;
+  --theme-bg: #1A1A1D;
+  --theme-text: #FFFFFF;
+  --theme-primary: #0055a4;
+  --theme-accent: #39FF14;
   --theme-card-bg: #242526;
 }
 
