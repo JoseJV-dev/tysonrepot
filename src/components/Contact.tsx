@@ -3,7 +3,7 @@ import { MessageCircle } from 'lucide-react';
 
 export function Contact() {
   return (
-    <div className="mt-32 pt-20 border-t border-slate-200 dark:border-white/10 pb-20" id="contact">
+    <div className="mt-10 pt-10 pb-20" id="contact">
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         whileInView={{ opacity: 1, scale: 1 }}
@@ -22,7 +22,7 @@ export function Contact() {
           <p className="text-xl md:text-2xl font-bold text-azul dark:text-neon mt-4 mb-8">
             VAMOS CRIAR A PRIMEIRA FÓRMULA JUNTOS.
           </p>
-          <a href="#" className="bg-azul dark:bg-neon text-white dark:text-chumbo hover:bg-azul/90 dark:hover:bg-white px-8 py-5 rounded-full font-black uppercase tracking-widest text-sm shadow-[0_0_30px_rgba(0,85,164,0.3)] dark:shadow-[0_0_30px_rgba(57,255,20,0.3)] hover:shadow-[0_0_40px_rgba(0,85,164,0.5)] dark:hover:shadow-[0_0_40px_rgba(57,255,20,0.5)] transition-all flex items-center gap-3 group">
+          <a href="https://wa.me/244943803380" className="bg-azul dark:bg-neon text-white dark:text-chumbo hover:bg-azul/90 dark:hover:bg-white px-8 py-5 rounded-full font-black uppercase tracking-widest text-sm shadow-[0_0_30px_rgba(0,85,164,0.3)] dark:shadow-[0_0_30px_rgba(57,255,20,0.3)] hover:shadow-[0_0_40px_rgba(0,85,164,0.5)] dark:hover:shadow-[0_0_40px_rgba(57,255,20,0.5)] transition-all flex items-center gap-3 group">
             <MessageCircle className="w-5 h-5 group-hover:scale-110 transition-transform" />
             Falar no WhatsApp
           </a>

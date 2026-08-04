@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { ThemeToggle } from './ThemeToggle';
+import { useLenis } from 'lenis/react';
 
 type MenuItem = {
   label: string;
@@ -17,22 +18,23 @@ const menuItems: MenuItem[] = [
     href: '#desafios',
     subItems: [
       { label: 'Educação', href: '#educacao' },
-      { label: 'Desenvolvimento Digital', href: '#digital' },
-      { label: 'Projetos Tecnológicos', href: '#projetos-tec' },
-      { label: 'Prestação de Serviços', href: '#servicos' }
+      { label: 'Desenvolvimento Digital', href: '#produtos' },
+      { label: 'Projetos Tecnológicos', href: '#projetos' },
+      { label: 'Prestação de Serviços', href: '#tecnologia' }
     ]
   },
   { 
     label: 'Nossas Soluções', 
     href: '#solucoes',
     subItems: [
+      { label: 'ATL EM CASA', href: '#atl' },
       { label: 'Kina Service', href: '#kina' },
       { label: 'Bolt', href: '#bolt' },
       { label: 'Soluções para Empresas', href: '#instituicoes' },
       { label: 'Projetos em Desenvolvimento', href: '#dev' }
     ]
   },
-  { label: 'ATL em Casa', href: '#atl' },
+  
   { label: 'Projetos', href: '#projetos' },
   { label: 'Sobre Nós', href: '#sobre' },
   { label: 'Contactos', href: '#contact' },
@@ -44,6 +46,7 @@ export function NavMenu() {
   const [isRobotOpen, setIsRobotOpen] = useState(false);
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
   const { theme } = useTheme();
+  const lenis = useLenis();
 
   useEffect(() => {
     const handleScrollEvent = () => {
@@ -84,13 +87,19 @@ export function NavMenu() {
   useEffect(() => {
     if (isOpen && !isRobotOpen) {
       document.body.style.overflow = 'hidden';
+      document.documentElement.style.overflow = 'hidden';
+      lenis?.stop();
     } else {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+      lenis?.start();
     }
     return () => {
       document.body.style.overflow = 'unset';
+      document.documentElement.style.overflow = 'unset';
+      lenis?.start();
     };
-  }, [isOpen, isRobotOpen]);
+  }, [isOpen, isRobotOpen, lenis]);
 
   const handleScroll = (e: React.MouseEvent<HTMLAnchorElement, MouseEvent>, href: string) => {
     e.preventDefault();
@@ -150,9 +159,7 @@ export function NavMenu() {
                       <a
                         key={subItem.label}
                         href={subItem.href}
-                        onClick={(e) => {
-                          e.preventDefault();
-                        }}
+                        onClick={(e) => handleScroll(e, subItem.href)}
                         className="block px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-white/70 hover:text-azul dark:hover:text-neon hover:bg-slate-50 dark:hover:bg-white/5 rounded-lg transition-colors"
                       >
                         {subItem.label}
@@ -165,7 +172,7 @@ export function NavMenu() {
           );
         })}
         <a 
-          href="https://wa.me/244900000000" 
+          href="https://wa.me/244943803380" 
           target="_blank" 
           rel="noopener noreferrer"
           className="bg-[#25D366] text-white px-5 py-2.5 rounded-full font-bold uppercase tracking-wider text-xs flex items-center gap-2 hover:scale-105 transition-transform"
@@ -196,7 +203,8 @@ export function NavMenu() {
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
-            className={`absolute top-full left-0 right-0 p-6 flex flex-col gap-4 shadow-2xl z-50 border-b bg-white dark:bg-chumbo border-slate-200 dark:border-white/10 max-h-[80vh] overflow-y-auto`}
+            className={`absolute top-full left-0 right-0 p-6 flex flex-col gap-4 shadow-2xl z-50 border-b bg-white dark:bg-[#1A1A1D] border-slate-200 dark:border-white/10 max-h-[80vh] overflow-y-auto`}
+            data-lenis-prevent="true"
           >
             {menuItems.map((item) => {
               const sectionId = item.href.substring(1);
@@ -236,7 +244,7 @@ export function NavMenu() {
                                 key={subItem.label}
                                 href={subItem.href}
                                 className="text-sm font-bold uppercase tracking-wider text-slate-500 dark:text-white/60 hover:text-azul dark:hover:text-neon"
-                                onClick={(e) => e.preventDefault()}
+                                onClick={(e) => handleScroll(e, subItem.href)}
                               >
                                 {subItem.label}
                               </a>
@@ -251,7 +259,7 @@ export function NavMenu() {
             })}
             
             <a 
-              href="https://wa.me/244900000000" 
+              href="https://wa.me/244943803380" 
               target="_blank" 
               rel="noopener noreferrer"
               className="mt-6 bg-[#25D366] text-white p-4 rounded-xl font-bold uppercase tracking-widest text-center flex items-center justify-center gap-3"

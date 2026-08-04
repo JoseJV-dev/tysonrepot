@@ -1,4 +1,4 @@
-import { Github, Linkedin, Twitter, Mail, Infinity } from 'lucide-react';
+import { Facebook, Instagram, Youtube, Mail, Infinity } from 'lucide-react';
 import { useTheme } from './ThemeProvider';
 import { motion } from 'motion/react';
 
@@ -46,22 +46,22 @@ export function Footer() {
           <div className="flex flex-col gap-4">
             <h4 className={`text-xs font-bold tracking-widest uppercase mb-2 ${theme === 'dark' ? 'text-branco' : 'text-slate-900'}`}>Contato</h4>
             
-            <a href="mailto:tysonferry3@gmail.com" className={`flex items-center gap-2 text-sm font-medium transition-colors ${theme === 'dark' ? 'text-branco/60 hover:text-neon' : 'text-slate-600 hover:text-azul'}`}>
+            <a href="mailto:vetorzero.ao@gmail.com" className={`flex items-center gap-2 text-sm font-medium transition-colors ${theme === 'dark' ? 'text-branco/60 hover:text-neon' : 'text-slate-600 hover:text-azul'}`}>
                <Mail size={16} />
-               tysonferry3@gmail.com
+               vetorzero.ao@gmail.com
             </a>
             
             <div className="flex items-center gap-4 mt-2">
-              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="LinkedIn">
-                <Linkedin className="w-4 h-4" />
+              <a href="https://www.facebook.com/vetorzeroao" target="_blank" rel="noopener noreferrer" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="Facebook">
+                <Facebook className="w-4 h-4" />
               </a>
-              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="GitHub">
-                <Github className="w-4 h-4" />
+              <a href="https://www.instagram.com/invites/contact/?igsh=1l6l46lb4yz6e&utm_content=hvimk83" target="_blank" rel="noopener noreferrer" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="Instagram">
+                <Instagram className="w-4 h-4" />
               </a>
-              <a href="#" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="Twitter">
-                <Twitter className="w-4 h-4" />
+              <a href="https://youtube.com/@vetorzeroao?si=wpBgduE7hiBdCV9E" target="_blank" rel="noopener noreferrer" className={`p-2.5 rounded-full transition-all duration-300 ${theme === 'dark' ? 'bg-white/5 hover:bg-neon hover:text-chumbo text-branco' : 'bg-black/5 hover:bg-azul hover:text-white text-slate-700'}`} aria-label="YouTube">
+                <Youtube className="w-4 h-4" />
               </a>
-            </div>
+</div>
           </div>
         </div>
 

@@ -48,7 +48,7 @@ const AnimatedLightning: React.FC<AnimatedLightningProps> = ({ path, delay, them
         repeatDelay: delay,
         ease: "linear"
       }}
-      style={{ filter: `drop-shadow(0 0 10px ${theme === 'dark' ? '#ccff00' : '#0055ff'})` }}
+      
     />
   );
 };
@@ -67,10 +67,10 @@ export function BackgroundElements() {
     <div className="fixed inset-0 pointer-events-none z-[-1] overflow-hidden bg-fixed">
       {/* Static Glows (using CSS instead of JS animation for better performance) */}
       <div 
-        className={`absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-[120px] bg-azul ${theme === 'dark' ? 'opacity-[0.10]' : 'opacity-[0.03]'}`} 
+        className={`absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full blur-3xl md:blur-[120px] bg-azul ${theme === 'dark' ? 'opacity-[0.10]' : 'opacity-[0.03]'}`} 
       />
       <div 
-        className={`absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-[120px] bg-neon ${theme === 'dark' ? 'opacity-[0.05]' : 'opacity-[0.02]'}`} 
+        className={`absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] rounded-full blur-3xl md:blur-[120px] bg-neon ${theme === 'dark' ? 'opacity-[0.05]' : 'opacity-[0.02]'}`} 
       />
       
       {/* Floating Formulas - Drastically reduced for performance */}
@@ -150,7 +150,7 @@ export function BackgroundElements() {
       </svg>
 
       {/* Dynamic Lightning Circuits */}
-      <svg className={`absolute inset-0 w-full h-full pointer-events-none ${theme === 'dark' ? 'opacity-30' : 'opacity-20'}`} viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+      <svg className={`hidden md:block absolute inset-0 w-full h-full pointer-events-none ${theme === 'dark' ? 'opacity-30' : 'opacity-20'}`} viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
         {lightnings.map((path, i) => (
           <AnimatedLightning key={`lightning-${i}`} path={path} delay={i * 1.5 + Math.random() * 2} theme={theme} />
         ))}

@@ -3,7 +3,7 @@ import { Target } from 'lucide-react';
 
 export function About() {
   return (
-    <div className="mt-32 pt-20 border-t border-slate-200 dark:border-white/10" id="sobre">
+    <div className="pt-12 md:pt-16 pb-10" id="sobre">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
